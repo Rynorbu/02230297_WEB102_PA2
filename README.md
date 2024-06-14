@@ -23,7 +23,7 @@ open http://localhost:3000
 
 ## Endpoints
 
-1. User Registration
+## 1. User Registration
 
 ### Description: 
 
@@ -49,7 +49,7 @@ Since this is the post request we should use this as an example in the body.
 * 400 Bad Request: Missing email or password.
 * 500 Internal Server Error: Server error occurred.
 
-2. User Login
+## 2. User Login
 
 ### Description
 
@@ -70,7 +70,7 @@ After the registration is completed the user needs to login using the registered
 * 401 Unauthorized: Invalid credentials.
 * 500 Internal Server Error: Server error occurred.
 
-3. Get Pokémon Information
+## 3. Get Pokémon Information
 
 ### Description 
 
@@ -89,7 +89,7 @@ This endpoint retrieves the information about a Pokémon from PokeAPI.
 * 404 Not Found: Pokémon with the specified name not found.
 * 500 Internal Server Error: Server error occurred.
 
-4. Capture Pokémon
+## 4. Capture Pokémon
 
 ### Description: 
 
@@ -112,7 +112,7 @@ Should enter the name of the pokemon the user likes to capture in the request bo
 * 401 Unauthorized: User not authenticated.
 * 500 Internal Server Error: Server error occurred.
 
-5. Get Captured Pokémon
+## 5. Get Captured Pokémon
 
 ### Description: 
 
@@ -126,7 +126,7 @@ Retrieves Pokémon captured by the logged-in user.
 * 401 Unauthorized: User not authenticated.
 * 500 Internal Server Error: Server error occurred.
 
-6. Release Pokémon
+## 6. Release Pokémon
 
 ### Description: 
 
