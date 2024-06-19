@@ -8,23 +8,24 @@ datasource db {
 }
 
 model User {
-  id             String     @id @default(uuid())
-  email          String     @unique
-  hashedPassword String
-  caughtPokemon  CaughtPokemon[]
+  id             String           @id @default(uuid())
+  name           String
+  email          String           @unique
+  password       String
+  Pokemon_stored Pokemon_stored[]
 }
 
 model Pokemon {
-  id            String         @id @default(uuid())
-  name          String         @unique
-  caughtPokemon CaughtPokemon[]
+  id             String           @id @default(uuid())
+  name           String           @unique
+  Pokemon_stored Pokemon_stored[]
 }
 
-model CaughtPokemon {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  pokemonId String
-  pokemon   Pokemon  @relation(fields: [pokemonId], references: [id])
-  caughtAt  DateTime @default(now())
+model Pokemon_stored {
+  id        String    @id @default(uuid())
+  userid    String
+  pokemonid String
+  caughtat  DateTime? @default(now())
+  Pokemon   Pokemon   @relation(fields: [pokemonid], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User      User      @relation(fields: [userid], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }

@@ -7,9 +7,9 @@ This application provides users to manage the endpoints for user registration, a
 * User Registration: Users can register with their email and password.
 * User Authentication: Users can log in and receive a JWT token for authenticated requests.
 * Pokémon Information Retrieval: Fetch detailed information about a specific Pokémon from PokeAPI.
-* Capture Pokémon: Authenticated users can capture Pokémon and add them to their collection.
-* View Captured Pokémon: Authenticated users can view a list of Pokémon they have captured.
-* Release Pokémon: Authenticated users can release a captured Pokémon from their collection.
+* Pokémon stored: Authenticated users can capture Pokémon and add them to their collection.
+* View stored Pokémon: Authenticated users can view a list of Pokémon they have stored.
+* Release Pokémon: Authenticated users can release a stored Pokémon from their collection.
 
 ## To install dependencies:
 
@@ -27,7 +27,7 @@ open http://localhost:3000
 
 ### Description: 
 
-This endpoint registers a new user with email and hashedPassword. We first need to register to login and capture the pokemon that are in the user likes.
+This endpoint registers a new user with name, email and Password, hashes the password using bcrypt, and saves the user information in the database. We first need to register to login and capture the pokemon that are in the user likes.
 
 * URL: `/register`
 * Method: POST  
@@ -39,15 +39,12 @@ Since this is the post request we should use this as an example in the body.
 #### Example
 
     {
+    "name": "username",
     "email": "user@example.com",
-    "hashedPassword": "password"
+    "password": "password"
     }
 
-### Responses:
 
-* 200 OK: User successfully registered.
-* 400 Bad Request: Missing email or password.
-* 500 Internal Server Error: Server error occurred.
 
 ## 2. User Login
 
@@ -61,20 +58,17 @@ After the registration is completed the user needs to login using the registered
 ### Request Body
 
     {
+    "name": "username
     "email": "user@example.com",
-    "hashedPassword": "password"
+    "password": "password"
     }
 
-### Responses:
-* 200 OK: Login successful, returns a JWT token.
-* 401 Unauthorized: Invalid credentials.
-* 500 Internal Server Error: Server error occurred.
 
 ## 3. Get Pokémon Information
 
 ### Description 
 
-This endpoint retrieves the information about a Pokémon from PokeAPI.
+This endpoint retrieves the information about a Pokémon from PokeAPI based on pokemon name.
 
 * URL: /pokeinfo/:name
 * Method: GET
@@ -83,17 +77,11 @@ This endpoint retrieves the information about a Pokémon from PokeAPI.
 
 * name: Should use pokemon name to get the information about the pokemon.
 
-### Responses:
-
-* 200 OK: Pokémon information retrieved successfully.
-* 404 Not Found: Pokémon with the specified name not found.
-* 500 Internal Server Error: Server error occurred.
-
 ## 4. Capture Pokémon
 
 ### Description: 
 
-This allows a logged-in user to capture a Pokémon that he likes.
+This allows an authenticated user to capture a Pokémon. It first verifies the JWT token. If the Pokémon does not exist in the database, it creates a new entry. Then, it associates the Pokémon with the user as a captured Pokémon. It allows a logged-in user to store a Pokémon that he likes.
 
 * URL: /poke/catch
 * Method: POST
@@ -106,49 +94,35 @@ Should enter the name of the pokemon the user likes to capture in the request bo
     "name": "Pikachu"
     }
 
-### Responses:
-* 200 OK: Pokémon captured successfully.
-* 400 Bad Request: Pokémon name missing in request body.
-* 401 Unauthorized: User not authenticated.
-* 500 Internal Server Error: Server error occurred.
 
 ## 5. Get Captured Pokémon
 
 ### Description: 
 
-Retrieves Pokémon captured by the logged-in user.
+This endpoint retrieves all Pokémon captured by the authenticated user. It verifies the JWT token before fetching the data.
 
 * URL: /poke/captured
 * Method: GET
 
-### Responses:
-* 200 OK: Returns captured Pokémon data.
-* 401 Unauthorized: User not authenticated.
-* 500 Internal Server Error: Server error occurred.
 
 ## 6. Release Pokémon
 
 ### Description: 
 
-Allows the logged-in user to release a captured Pokémon.
+Allows the authenticated user to release a captured Pokémon.
 
 * URL: /poke/release/:name
 * Method: DELETE
 
 ### URL Parameters
 
-* name: Enter the name of the Pokémon to release.
-
-### Responses
-
-* 200 OK: Pokémon released successfully.
-* 401 Unauthorized: User not authenticated.
-* 404 Not Found: Pokémon with the specified name not found in captured list.
-* 500 Internal Server Error: Server error occurred.
+* name: Enter the name of the Pokémon to release or delete.
 
 ## Technologies Used
 
 * Node.js: Runtime environment.
 * Prisma: ORM for database operations.
+* Bun: Task runner for running the application.
 * Axios: HTTP client for making external API requests.
 * JWT: JSON Web Tokens for user authentication.
+* Database used: SQLite.

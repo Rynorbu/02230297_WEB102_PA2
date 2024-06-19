@@ -21,11 +21,12 @@ app.use(
   })
 );
 
-// endpoint for the registion
+// Endpoint for registration
 app.post("/register", async (c) => {
   const body = await c.req.json();
   const email = body.email;
   const password = body.password;
+  const name = body.name;
 
   const bcryptHash = await Bun.password.hash(password, {
     algorithm: "bcrypt",
@@ -35,8 +36,9 @@ app.post("/register", async (c) => {
   try {
     const user = await prisma.user.create({
       data: {
-          email: email,
-          hashedPassword: bcryptHash,
+        name: name,
+        email: email,
+        password: bcryptHash,
       },
     });
 
@@ -51,7 +53,7 @@ app.post("/register", async (c) => {
   }
 });
 
-// endpoint for the login page to authencate the user
+// Endpoint for login to authenticate the user
 app.post("/login", async (c) => {
   try {
     const body = await c.req.json();
@@ -60,7 +62,7 @@ app.post("/login", async (c) => {
 
     const user = await prisma.user.findUnique({
       where: { email: email },
-      select: { id: true, hashedPassword: true },
+      select: { id: true, password: true },
     });
 
     if (!user) {
@@ -69,17 +71,17 @@ app.post("/login", async (c) => {
 
     const match = await Bun.password.verify(
       password,
-      user.hashedPassword,
+      user.password,
       "bcrypt"
     );
 
     if (match) {
       const payload = {
         sub: user.id,
-        exp: Math.floor(Date.now() / 1000) + 60 * 60, 
+        exp: Math.floor(Date.now() / 1000) + 60 * 60,
       };
       const secret = "mySecretKey";
-      const token = await sign(payload, secret); 
+      const token = await sign(payload, secret);
 
       if (typeof token !== "string") {
         console.error("Token signing failed", token);
@@ -100,7 +102,7 @@ app.post("/login", async (c) => {
   }
 });
 
-// endpoint for the pokemon information
+// Endpoint for Pokémon information
 app.get("/pokeinfo/:name", async (c) => {
   const { name } = c.req.param();
 
@@ -124,12 +126,12 @@ app.get("/pokeinfo/:name", async (c) => {
   }
 });
 
-// endpoint to capture pokemon
+// Endpoint to capture Pokémon
 app.post("/poke/catch", async (c) => {
   try {
     const payload = c.get("jwtPayload");
     if (!payload) {
-      throw new HTTPException(401, { message: "you are not authorized!! check the authentication" });
+      throw new HTTPException(401, { message: "You are not authorized! Check the authentication" });
     }
 
     const body = await c.req.json();
@@ -149,14 +151,14 @@ app.post("/poke/catch", async (c) => {
       });
     }
 
-    const caughtPokemon = await prisma.caughtPokemon.create({
+    const caughtPokemon = await prisma.pokemon_stored.create({
       data: {
-        userId: payload.sub,
-        pokemonId: pokemon.id,
+        userid: payload.sub,
+        pokemonid: pokemon.id,
       },
     });
 
-    return c.json({ message: "The pokemon is captured successfully", data: caughtPokemon });
+    return c.json({ message: "The Pokémon is captured successfully", data: caughtPokemon });
   } catch (error) {
     console.error(error);
     if (error instanceof HTTPException) {
@@ -167,22 +169,22 @@ app.post("/poke/catch", async (c) => {
   }
 });
 
-// endpoint to get the captured pokemon 
+// Endpoint to get the captured Pokémon 
 app.get("/poke/captured", async (c) => {
   const payload = c.get('jwtPayload');
   if (!payload) {
     throw new HTTPException(401, { message: "Unauthorized access" });
   }
 
-  const capturedPokemon = await prisma.caughtPokemon.findMany({
-    where: { userId: payload.sub },
-    include: { pokemon: true },
+  const capturedPokemon = await prisma.pokemon_stored.findMany({
+    where: { userid: payload.sub },
+    include: { Pokemon: true },
   });
 
   return c.json({ data: capturedPokemon });
 });
 
-// endpoint to delete the captured pokemon
+// Endpoint to delete the captured Pokémon
 app.delete("/poke/release/:name", async (c) => {
   const payload = c.get('jwtPayload');
   if (!payload) {
@@ -194,14 +196,14 @@ app.delete("/poke/release/:name", async (c) => {
   const pokemon = await prisma.pokemon.findUnique({ where: { name } });
 
   if (!pokemon) {
-    return c.json({ message: "This pokemon name is not in the captured list" }, 404);
+    return c.json({ message: "This Pokémon name is not in the captured list" }, 404);
   }
 
-  await prisma.caughtPokemon.deleteMany({
-    where: { pokemonId: pokemon.id, userId: payload.sub },
+  await prisma.pokemon_stored.deleteMany({
+    where: { pokemonid: pokemon.id, userid: payload.sub },
   });
 
-  return c.json({ message: "Pokemon released from the captured list" });
+  return c.json({ message: "Pokémon released from the captured list" });
 });
 
 export default app;
