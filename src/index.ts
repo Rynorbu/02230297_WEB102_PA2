@@ -126,7 +126,7 @@ app.get("/pokeinfo/:name", async (c) => {
   }
 });
 
-// Endpoint to capture Pokémon
+// Endpoint to store Pokémon
 app.post("/poke/catch", async (c) => {
   try {
     const payload = c.get("jwtPayload");
@@ -139,6 +139,21 @@ app.post("/poke/catch", async (c) => {
 
     if (!pokemonName) {
       throw new HTTPException(400, { message: "Pokemon name is required" });
+    }
+
+    // Validate if the Pokémon exists by querying the Pokémon API
+    try {
+      const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`);
+      if (response.status !== 200) {
+        return c.json({ message: "Pokémon not found!" }, 404);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        return c.json({ message: "Pokémon not found!" }, 404);
+      } else {
+        console.error("Error occurred while validating Pokémon:", error);
+        throw new HTTPException(500, { message: "Error occurred while validating Pokémon" });
+      }
     }
 
     let pokemon = await prisma.pokemon.findUnique({
@@ -169,7 +184,7 @@ app.post("/poke/catch", async (c) => {
   }
 });
 
-// Endpoint to get the captured Pokémon 
+// Endpoint to get the stored Pokémon 
 app.get("/poke/captured", async (c) => {
   const payload = c.get('jwtPayload');
   if (!payload) {
@@ -184,7 +199,7 @@ app.get("/poke/captured", async (c) => {
   return c.json({ data: capturedPokemon });
 });
 
-// Endpoint to delete the captured Pokémon
+// Endpoint to delete the stored Pokémon
 app.delete("/poke/release/:name", async (c) => {
   const payload = c.get('jwtPayload');
   if (!payload) {
