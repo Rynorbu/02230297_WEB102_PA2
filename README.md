@@ -63,8 +63,16 @@ After the registration is completed the user needs to login using the registered
     "password": "password"
     }
 
+## 3. Get all user Information
 
-## 3. Get Pokémon Information
+### Description 
+
+This endpoint retrieves all the information about a users that are registered.
+
+* URL: /users
+* Method: GET
+
+## 4. Get Pokémon Information
 
 ### Description 
 
@@ -77,7 +85,7 @@ This endpoint retrieves the information about a Pokémon from PokeAPI based on p
 
 * name: Should use pokemon name to get the information about the pokemon.
 
-## 4. Capture Pokémon
+## 5. Capture Pokémon
 
 ### Description: 
 
@@ -95,7 +103,7 @@ Should enter the name of the pokemon the user likes to capture in the request bo
     }
 
 
-## 5. Get Captured Pokémon
+## 6. Get Captured Pokémon
 
 ### Description: 
 
@@ -105,7 +113,7 @@ This endpoint retrieves all Pokémon captured by the authenticated user. It veri
 * Method: GET
 
 
-## 6. Release Pokémon
+## 7. Release Pokémon
 
 ### Description: 
 

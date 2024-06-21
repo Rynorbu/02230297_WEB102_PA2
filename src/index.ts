@@ -102,27 +102,23 @@ app.post("/login", async (c) => {
   }
 });
 
-// Endpoint for Pokémon information
-app.get("/pokeinfo/:name", async (c) => {
-  const { name } = c.req.param();
+// CRUD for user information
 
+// Endpoint to get all users
+app.get("/users", async (c) => {
   try {
-    const response = await axios.get(
-      `https://pokeapi.co/api/v2/pokemon/${name}`
-    );
-    return c.json({ data: response.data });
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+
+    return c.json({ data: users });
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      if (error.response && error.response.status === 404) {
-        return c.json({ message: "Pokémon not found!" }, 404);
-      }
-      return c.json(
-        { message: "Error occurred while retrieving Pokémon information" },
-        500
-      );
-    } else {
-      return c.json({ message: "Unexpected server error" }, 500);
-    }
+    console.error(error);
+    throw new HTTPException(500, { message: "Internal Server Error" });
   }
 });
 
