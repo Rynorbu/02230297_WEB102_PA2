@@ -58,7 +58,6 @@ After the registration is completed the user needs to login using the registered
 ### Request Body
 
     {
-    "name": "username
     "email": "user@example.com",
     "password": "password"
     }
